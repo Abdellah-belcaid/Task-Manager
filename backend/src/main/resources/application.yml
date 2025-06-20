@@ -1,0 +1,21 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: task-manager
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/task_manager_db}
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:admin123}
+
+  jpa:
+    show-sql: true
+    generate-ddl: false
+
+  flyway:
+    baseline-on-migrate: true
+    default-schema: public
+    schemas: public
+    baseline-version: 0
