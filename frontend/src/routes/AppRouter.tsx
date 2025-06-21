@@ -9,11 +9,9 @@ const AppRouter: React.FC = () => {
 
   return (
     <Suspense fallback={<div> Loading...</div>}>
-      <div key={location.pathname} className="relative">
-        <Routes location={location}>
-          <Route path={ROUTES.HOME} element={<HomePage />} />
-        </Routes>
-      </div>
+      <Routes location={location}>
+        <Route path={ROUTES.HOME} element={<HomePage />} />
+      </Routes>
     </Suspense>
   );
 };
