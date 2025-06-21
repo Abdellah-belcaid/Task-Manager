@@ -4,6 +4,7 @@ import com.taskmanager.dto.TaskCriteria;
 import com.taskmanager.dto.TaskDTO;
 import com.taskmanager.entity.Task;
 import com.taskmanager.exception.GlobalExceptionHandler;
+import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.mapper.TaskMapper;
 import com.taskmanager.service.TaskService;
 import com.taskmanager.util.TaskTestHelper;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,6 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TaskControllerTest {
 
     private static final String BASE_URL = "/api/v1/tasks";
+    private static final String GET_TASK_BY_ID_URL = BASE_URL + "/{id}";
+
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_SIZE = 10;
     private static final String DEFAULT_SORT_BY = "createdAt";
@@ -47,13 +51,14 @@ class TaskControllerTest {
 
     private List<Task> mockTasks;
     private List<TaskDTO> mockTaskDTOs;
+    private UUID taskId;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(taskController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
-
+        taskId = UUID.randomUUID();
         mockTasks = TaskTestHelper.getAllTasks();
         mockTaskDTOs = mockTasks.stream()
                 .map(TaskMapper::toDto)
@@ -98,4 +103,30 @@ class TaskControllerTest {
                         .param("size", "0"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("Should return task when valid ID is provided")
+    void should_returnTask_when_validId() throws Exception {
+
+        TaskDTO mockTaskDTO = mockTaskDTOs.getFirst();
+        when(taskService.getTaskById(taskId)).thenReturn(mockTaskDTO);
+
+        mockMvc.perform(get(GET_TASK_BY_ID_URL, taskId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value(mockTaskDTO.getTitle()))
+                .andExpect(jsonPath("$.description").value(mockTaskDTO.getDescription()))
+                .andExpect(jsonPath("$.status").value(mockTaskDTO.getStatus().toString()))
+                .andExpect(jsonPath("$.priority").value(mockTaskDTO.getPriority().toString()));
+    }
+
+    @Test
+    @DisplayName("Should return 404 Not Found when task ID does not exist")
+    void should_returnNotFound_when_invalidId() throws Exception {
+        when(taskService.getTaskById(taskId)).thenThrow(new TaskNotFoundException("Task not found with ID: " + taskId));
+
+        mockMvc.perform(get(GET_TASK_BY_ID_URL, taskId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").value("Task not found with ID: " + taskId));
+    }
+
 }

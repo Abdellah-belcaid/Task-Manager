@@ -2,6 +2,7 @@ package com.taskmanager.service.impl;
 
 import com.taskmanager.dto.TaskCriteria;
 import com.taskmanager.dto.TaskDTO;
+import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.mapper.TaskMapper;
 import com.taskmanager.repository.TaskRepository;
 import com.taskmanager.service.TaskService;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,13 +32,21 @@ public class TaskServiceImpl implements TaskService {
                 : Sort.Direction.ASC;
 
         PageRequest pageRequest = PageRequest.of(
-                taskCriteria.getPage() - 1, 
+                taskCriteria.getPage() - 1,
                 taskCriteria.getSize(),
                 Sort.by(direction, taskCriteria.getSortBy())
         );
 
         return taskRepository.findAll(pageRequest)
                 .map(TaskMapper::toDto);
+    }
+
+    @Override
+    public TaskDTO getTaskById(UUID id) {
+        log.info("Fetching task by ID: {}", id);
+        return taskRepository.findById(id)
+                .map(TaskMapper::toDto)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
     }
 
 }

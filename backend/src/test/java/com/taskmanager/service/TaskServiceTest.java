@@ -3,6 +3,7 @@ package com.taskmanager.service;
 import com.taskmanager.dto.TaskCriteria;
 import com.taskmanager.dto.TaskDTO;
 import com.taskmanager.entity.Task;
+import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.repository.TaskRepository;
 import com.taskmanager.service.impl.TaskServiceImpl;
 import com.taskmanager.util.TaskTestHelper;
@@ -19,8 +20,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,11 +38,12 @@ class TaskServiceTest {
 
     private List<Task> mockTasks;
     private TaskCriteria taskCriteria;
+    private UUID taskId;
 
     @BeforeEach
     void setUp() {
         mockTasks = TaskTestHelper.getAllTasks();
-
+        taskId = UUID.randomUUID();
         taskCriteria = TaskCriteria.builder()
                 .page(1)
                 .size(10)
@@ -64,4 +69,34 @@ class TaskServiceTest {
         assertThat(result.getContent().getFirst().getCreatedAt()).isEqualTo(mockTasks.getFirst().getCreatedAt());
         assertThat(result.getTotalElements()).isEqualTo(mockTasks.size());
     }
+
+    @Test
+    @DisplayName("Should return TaskDTO when getTaskById is called with a valid ID")
+    void should_returnTaskDTO_when_getTaskById_withValidId() {
+        Task mockTask = mockTasks.getFirst();
+        mockTask.setId(taskId);
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(mockTask));
+
+        TaskDTO result = taskService.getTaskById(taskId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(mockTask.getId());
+        assertThat(result.getTitle()).isEqualTo(mockTask.getTitle());
+        assertThat(result.getDescription()).isEqualTo(mockTask.getDescription());
+        assertThat(result.getCreatedAt()).isEqualTo(mockTask.getCreatedAt());
+    }
+
+    @Test
+    @DisplayName("Should throw TaskNotFoundException when getTaskById is called with an invalid ID")
+    void should_throwTaskNotFoundException_when_getTaskById_withInvalidId() {
+        UUID invalidTaskId = UUID.randomUUID();
+
+        when(taskRepository.findById(invalidTaskId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> taskService.getTaskById(invalidTaskId))
+                .isInstanceOf(TaskNotFoundException.class)
+                .hasMessageContaining("Task not found with ID: " + invalidTaskId);
+    }
+
 }
