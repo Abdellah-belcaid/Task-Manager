@@ -71,4 +71,13 @@ public class TaskController {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskDTO> updateTask(@PathVariable @NotNull UUID id, @RequestBody @Validated TaskDTO taskDTO) {
+        log.info("Updating task with ID: {} - New Details: {}", id, taskDTO);
+
+        TaskDTO updatedTask = taskService.updateTask(id, taskDTO);
+        return ResponseEntity.ok(updatedTask);
+    }
+
 }

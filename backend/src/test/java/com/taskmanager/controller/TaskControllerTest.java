@@ -37,6 +37,7 @@ class TaskControllerTest {
     private static final String BASE_URL = "/api/v1/tasks";
     private static final String GET_TASK_BY_ID_URL = BASE_URL + "/{id}";
     private static final String DELETE_TASK_BY_ID_URL = BASE_URL + "/{id}";
+    private static final String UPDATE_TASK_BY_ID_URL = BASE_URL + "/{id}";
 
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_SIZE = 10;
@@ -169,5 +170,38 @@ class TaskControllerTest {
         mockMvc.perform(delete(DELETE_TASK_BY_ID_URL, taskId))
                 .andExpect(status().isNoContent());
     }
+
+
+    @Test
+    @DisplayName("Should update task when valid ID and data are provided")
+    void should_updateTask_when_validIdAndData() throws Exception {
+        TaskDTO mockTaskDTO = mockTaskDTOs.getFirst();
+        when(taskService.updateTask(ArgumentMatchers.any(UUID.class), ArgumentMatchers.any(TaskDTO.class)))
+                .thenReturn(mockTaskDTO);
+
+        mockMvc.perform(put(UPDATE_TASK_BY_ID_URL, taskId)
+                        .contentType("application/json")
+                        .content(TaskTestHelper.asJsonString(mockTaskDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value(mockTaskDTO.getTitle()))
+                .andExpect(jsonPath("$.description").value(mockTaskDTO.getDescription()))
+                .andExpect(jsonPath("$.status").value(mockTaskDTO.getStatus().toString()))
+                .andExpect(jsonPath("$.priority").value(mockTaskDTO.getPriority().toString()));
+    }
+
+    @Test
+    @DisplayName("Should return 404 Not Found when trying to update a non-existing task")
+    void should_returnNotFound_when_updateNonExistingTask() throws Exception {
+        TaskDTO mockTaskDTO = mockTaskDTOs.getFirst();
+        when(taskService.updateTask(ArgumentMatchers.any(UUID.class), ArgumentMatchers.any(TaskDTO.class)))
+                .thenThrow(new TaskNotFoundException("Task not found with ID: " + taskId));
+
+        mockMvc.perform(put(UPDATE_TASK_BY_ID_URL, taskId)
+                        .contentType("application/json")
+                        .content(TaskTestHelper.asJsonString(mockTaskDTO)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").value("Task not found with ID: " + taskId));
+    }
+
 
 }

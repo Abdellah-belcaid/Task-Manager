@@ -147,4 +147,37 @@ class TaskServiceTest {
     }
 
 
+    @Test
+    @DisplayName("Should update and return TaskDTO when updateTask is called with valid ID and TaskDTO")
+    void should_updateAndReturnTaskDTO_when_updateTask_withValidIdAndTaskDTO() {
+        TaskDTO taskDTO = getOneTaskDto(0);
+        Task taskEntity = TaskMapper.toEntity(taskDTO);
+        taskEntity.setId(taskId);
+
+        when(taskRepository.existsById(taskId)).thenReturn(true);
+        when(taskRepository.save(any(Task.class))).thenReturn(taskEntity);
+
+        TaskDTO result = taskService.updateTask(taskId, taskDTO);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(taskEntity.getId());
+        assertThat(result.getTitle()).isEqualTo(taskEntity.getTitle());
+        assertThat(result.getDescription()).isEqualTo(taskEntity.getDescription());
+        assertThat(result.getCreatedAt()).isEqualTo(taskEntity.getCreatedAt());
+    }
+
+    @Test
+    @DisplayName("Should throw TaskNotFoundException when updateTask is called with an invalid ID")
+    void should_throwTaskNotFoundException_when_updateTask_withInvalidId() {
+        UUID invalidTaskId = UUID.randomUUID();
+        TaskDTO taskDTO = getOneTaskDto(0);
+
+        when(taskRepository.existsById(invalidTaskId)).thenReturn(false);
+
+        assertThatThrownBy(() -> taskService.updateTask(invalidTaskId, taskDTO))
+                .isInstanceOf(TaskNotFoundException.class)
+                .hasMessageContaining("Task not found with ID: " + invalidTaskId);
+    }
+
+
 }

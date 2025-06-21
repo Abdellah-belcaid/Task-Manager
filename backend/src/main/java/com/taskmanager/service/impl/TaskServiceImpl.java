@@ -69,4 +69,20 @@ public class TaskServiceImpl implements TaskService {
         log.info("Task with ID: {} deleted successfully", id);
     }
 
+    @Override
+    public TaskDTO updateTask(UUID id, TaskDTO taskDTO) {
+
+        log.info("Updating task with ID: {} with details: {}", id, taskDTO);
+
+        if (!taskRepository.existsById(id)) {
+            throw new TaskNotFoundException("Task not found with ID: " + id);
+        }
+
+        var taskEntity = TaskMapper.toEntity(taskDTO);
+        taskEntity.setId(id);
+
+        var updatedTask = taskRepository.save(taskEntity);
+        return TaskMapper.toDto(updatedTask);
+    }
+
 }
