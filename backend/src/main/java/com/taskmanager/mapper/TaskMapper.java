@@ -21,6 +21,7 @@ public class TaskMapper {
                 .dueDate(task.getDueDate())
                 .completed(task.isCompleted())
                 .createdAt(task.getCreatedAt())
+                .updatedAt(task.getUpdatedAt())
                 .build();
     }
 

@@ -36,4 +36,6 @@ public class TaskDTO {
     private boolean completed;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }
