@@ -55,4 +55,13 @@ public class TaskController {
         TaskDTO task = taskService.getTaskById(id);
         return ResponseEntity.ok(task);
     }
+
+    @PostMapping
+    public ResponseEntity<TaskDTO> createTask(@RequestBody @Validated TaskDTO taskDTO) {
+        log.info("Creating new task: {}", taskDTO);
+
+        TaskDTO createdTask = taskService.createTask(taskDTO);
+        return ResponseEntity.status(201).body(createdTask);
+    }
+
 }

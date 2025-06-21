@@ -1,8 +1,12 @@
 package com.taskmanager.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.taskmanager.dto.TaskDTO;
 import com.taskmanager.entity.Task;
 import com.taskmanager.enumration.Priority;
 import com.taskmanager.enumration.Status;
+import com.taskmanager.mapper.TaskMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -78,6 +82,10 @@ public class TaskTestHelper {
         return copyOf(TASKS.get(index));
     }
 
+    public static TaskDTO getOneTaskDto(int index) {
+        return TaskMapper.toDto(copyOf((TASKS.get(index))));
+    }
+
     public static Task copyOf(Task task) {
         return Task.builder()
                 .id(task.getId())
@@ -90,4 +98,15 @@ public class TaskTestHelper {
                 .createdAt(task.getCreatedAt())
                 .build();
     }
+
+    public static String asJsonString(final Object obj) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            return mapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

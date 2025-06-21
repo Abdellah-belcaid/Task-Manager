@@ -11,4 +11,6 @@ public interface TaskService {
     Page<TaskDTO> getAllTasks(TaskCriteria taskCriteria);
 
     TaskDTO getTaskById(@NotNull UUID id);
+
+    TaskDTO createTask(TaskDTO taskDTO);
 }

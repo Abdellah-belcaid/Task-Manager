@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -128,5 +129,36 @@ class TaskControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$").value("Task not found with ID: " + taskId));
     }
+
+
+    @Test
+    @DisplayName("Should create a new task when valid data is provided")
+    void should_createTask_when_validRequest() throws Exception {
+        TaskDTO mockTaskDTO = mockTaskDTOs.getFirst();
+        when(taskService.createTask(ArgumentMatchers.any(TaskDTO.class))).thenReturn(mockTaskDTO);
+
+        mockMvc.perform(post(BASE_URL)
+                        .contentType("application/json")
+                        .content(TaskTestHelper.asJsonString(mockTaskDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value(mockTaskDTO.getTitle()))
+                .andExpect(jsonPath("$.description").value(mockTaskDTO.getDescription()))
+                .andExpect(jsonPath("$.status").value(mockTaskDTO.getStatus().toString()))
+                .andExpect(jsonPath("$.priority").value(mockTaskDTO.getPriority().toString()));
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when invalid data is provided")
+    void should_returnBadRequest_when_invalidRequest() throws Exception {
+        TaskDTO invalidTaskDTO = new TaskDTO();
+
+        mockMvc.perform(post(BASE_URL)
+                        .contentType("application/json")
+                        .content(TaskTestHelper.asJsonString(invalidTaskDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Title is required"))
+                .andExpect(jsonPath("$.status").value("Status is required"));
+    }
+
 
 }

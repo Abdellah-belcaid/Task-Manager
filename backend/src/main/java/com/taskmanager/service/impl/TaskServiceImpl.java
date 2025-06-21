@@ -22,7 +22,6 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
 
-
     @Override
     public Page<TaskDTO> getAllTasks(TaskCriteria taskCriteria) {
         log.info("Fetching tasks with criteria: {}", taskCriteria);
@@ -47,6 +46,16 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findById(id)
                 .map(TaskMapper::toDto)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+    }
+
+    @Override
+    public TaskDTO createTask(TaskDTO taskDTO) {
+        log.info("Creating a new task with details: {}", taskDTO);
+
+        var taskEntity = TaskMapper.toEntity(taskDTO);
+        var savedTask = taskRepository.save(taskEntity);
+
+        return TaskMapper.toDto(savedTask);
     }
 
 }

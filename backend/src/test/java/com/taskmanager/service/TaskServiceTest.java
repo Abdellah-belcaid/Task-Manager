@@ -4,6 +4,7 @@ import com.taskmanager.dto.TaskCriteria;
 import com.taskmanager.dto.TaskDTO;
 import com.taskmanager.entity.Task;
 import com.taskmanager.exception.TaskNotFoundException;
+import com.taskmanager.mapper.TaskMapper;
 import com.taskmanager.repository.TaskRepository;
 import com.taskmanager.service.impl.TaskServiceImpl;
 import com.taskmanager.util.TaskTestHelper;
@@ -23,8 +24,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.taskmanager.util.TaskTestHelper.getOneTaskDto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,6 +100,24 @@ class TaskServiceTest {
         assertThatThrownBy(() -> taskService.getTaskById(invalidTaskId))
                 .isInstanceOf(TaskNotFoundException.class)
                 .hasMessageContaining("Task not found with ID: " + invalidTaskId);
+    }
+
+
+    @Test
+    @DisplayName("Should create and return TaskDTO when createTask is called with valid TaskDTO")
+    void should_createAndReturnTaskDTO_when_createTask_withValidTaskDTO() {
+        TaskDTO taskDTO = getOneTaskDto(0);
+        Task taskEntity = TaskMapper.toEntity(taskDTO);
+
+        when(taskRepository.save(any(Task.class))).thenReturn(taskEntity);
+
+        TaskDTO result = taskService.createTask(taskDTO);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(taskEntity.getId());
+        assertThat(result.getTitle()).isEqualTo(taskEntity.getTitle());
+        assertThat(result.getDescription()).isEqualTo(taskEntity.getDescription());
+        assertThat(result.getCreatedAt()).isEqualTo(taskEntity.getCreatedAt());
     }
 
 }
