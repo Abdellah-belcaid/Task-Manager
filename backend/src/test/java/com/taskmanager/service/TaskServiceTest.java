@@ -120,4 +120,31 @@ class TaskServiceTest {
         assertThat(result.getCreatedAt()).isEqualTo(taskEntity.getCreatedAt());
     }
 
+
+    @Test
+    @DisplayName("Should delete task when deleteTask is called with a valid ID")
+    void should_deleteTask_when_deleteTask_withValidId() {
+        Task mockTask = mockTasks.getFirst();
+        mockTask.setId(taskId);
+
+        when(taskRepository.existsById(taskId)).thenReturn(true);
+
+        taskService.deleteTask(taskId);
+
+        assertThat(taskRepository.existsById(taskId)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Should throw TaskNotFoundException when deleteTask is called with an invalid ID")
+    void should_throwTaskNotFoundException_when_deleteTask_withInvalidId() {
+        UUID invalidTaskId = UUID.randomUUID();
+
+        when(taskRepository.existsById(invalidTaskId)).thenReturn(false);
+
+        assertThatThrownBy(() -> taskService.deleteTask(invalidTaskId))
+                .isInstanceOf(TaskNotFoundException.class)
+                .hasMessageContaining("Task not found with ID: " + invalidTaskId);
+    }
+
+
 }

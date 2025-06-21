@@ -64,4 +64,11 @@ public class TaskController {
         return ResponseEntity.status(201).body(createdTask);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable @NotNull UUID id) {
+        log.info("Deleting task with ID: {}", id);
+
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
+    }
 }

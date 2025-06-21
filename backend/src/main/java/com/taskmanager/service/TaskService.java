@@ -13,4 +13,6 @@ public interface TaskService {
     TaskDTO getTaskById(@NotNull UUID id);
 
     TaskDTO createTask(TaskDTO taskDTO);
+
+    void deleteTask(@NotNull UUID id);
 }

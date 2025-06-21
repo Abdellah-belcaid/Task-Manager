@@ -25,9 +25,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +36,7 @@ class TaskControllerTest {
 
     private static final String BASE_URL = "/api/v1/tasks";
     private static final String GET_TASK_BY_ID_URL = BASE_URL + "/{id}";
+    private static final String DELETE_TASK_BY_ID_URL = BASE_URL + "/{id}";
 
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_SIZE = 10;
@@ -160,5 +161,13 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.status").value("Status is required"));
     }
 
+    @Test
+    @DisplayName("Should delete task when valid ID is provided")
+    void should_deleteTask_when_validId() throws Exception {
+        doNothing().when(taskService).deleteTask(taskId);
+
+        mockMvc.perform(delete(DELETE_TASK_BY_ID_URL, taskId))
+                .andExpect(status().isNoContent());
+    }
 
 }
