@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import { useAllTasks } from "../hooks/useAllTasks";
+import { useDeleteTask } from "../hooks/useDeleteTask";
 import type { TaskDTO } from "../types/task";
 import { ROUTES } from "../utils/constants";
 
@@ -29,6 +30,7 @@ const TasksPage: React.FC = () => {
 
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
 
+  const { mutate: deleteTask } = useDeleteTask();
   const { data, isLoading, error } = useAllTasks({
     page,
     size: rowsPerPage,
@@ -46,10 +48,10 @@ const TasksPage: React.FC = () => {
   const totalPages = Math.ceil(totalCount / rowsPerPage);
 
   const handleDelete = (taskId: string) => {
-    // TODO : Handle task deletion logic here
-    console.log(`Delete task with ID: ${taskId}`);
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      deleteTask(taskId);
+    }
   };
-
   const handleUpdate = (taskId: string) => {
     navigate(ROUTES.EDIT_TASK.replace(":id", taskId));
   };
