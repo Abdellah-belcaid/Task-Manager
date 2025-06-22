@@ -6,6 +6,7 @@ import {
   Plus,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import { useAllTasks } from "../hooks/useAllTasks";
 import type { TaskDTO } from "../types/task";
@@ -20,6 +21,7 @@ const columns = [
 ];
 
 const TasksPage: React.FC = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortBy, setSortBy] = useState("createdAt");
@@ -49,8 +51,7 @@ const TasksPage: React.FC = () => {
   };
 
   const handleUpdate = (taskId: string) => {
-    // TODO : Handle task update logic here
-    console.log(`Update task with ID: ${taskId}`);
+    navigate(ROUTES.EDIT_TASK.replace(":id", taskId));
   };
 
   const handleSort = (column: string) => {
