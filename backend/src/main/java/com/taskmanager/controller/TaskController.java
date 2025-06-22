@@ -49,9 +49,6 @@ public class TaskController {
                 .build();
 
         Page<TaskDTO> tasks = taskService.getAllTasks(taskCriteria);
-        if (tasks == null || tasks.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
 
         log.info("Fetched {} tasks", tasks.getTotalElements());
         return ResponseEntity.ok(tasks);

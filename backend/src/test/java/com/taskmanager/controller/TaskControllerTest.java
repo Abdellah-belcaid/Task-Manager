@@ -88,25 +88,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.content[0].status").value(mockTaskDTOs.getFirst().getStatus().toString()))
                 .andExpect(jsonPath("$.content[0].priority").value(mockTaskDTOs.getFirst().getPriority().toString()));
     }
-
-    @Test
-    @DisplayName("Should return 400 Bad Request when invalid page number is provided")
-    void should_returnBadRequest_when_invalidPageParam() throws Exception {
-        mockMvc.perform(get(BASE_URL)
-                        .param("page", "0")
-                        .param("size", String.valueOf(DEFAULT_SIZE)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Should return 400 Bad Request when invalid size is provided")
-    void should_returnBadRequest_when_invalidSizeParam() throws Exception {
-        mockMvc.perform(get(BASE_URL)
-                        .param("page", String.valueOf(DEFAULT_PAGE))
-                        .param("size", "0"))
-                .andExpect(status().isBadRequest());
-    }
-
+    
     @Test
     @DisplayName("Should return task when valid ID is provided")
     void should_returnTask_when_validId() throws Exception {
