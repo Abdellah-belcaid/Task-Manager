@@ -1,5 +1,5 @@
 export interface TaskDTO {
-  id?: string; 
+  id?: string;
 
   title: string;
 
@@ -18,5 +18,17 @@ export interface TaskDTO {
   updatedAt?: string;
 }
 
-export type Priority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-export type Status = "TODO" | "IN_PROGRESS" | "DONE";
+export const StatusValues = ["TODO", "IN_PROGRESS", "DONE"] as const;
+export const PriorityValues = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
+
+export type Status = (typeof StatusValues)[number];
+export type Priority = (typeof PriorityValues)[number];
+
+export const INIT_TASK_VALUES: TaskDTO = {
+  title: "",
+  description: "",
+  status: "TODO",
+  priority: "MEDIUM",
+  dueDate: new Date().toISOString().split("T")[0], // Default to today
+  completed: false,
+};

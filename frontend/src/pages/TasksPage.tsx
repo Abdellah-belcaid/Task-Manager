@@ -1,8 +1,15 @@
-import { ChevronDown, ChevronUp, DeleteIcon, EditIcon } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  DeleteIcon,
+  EditIcon,
+  Plus,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Pagination from "../components/Pagination";
 import { useAllTasks } from "../hooks/useAllTasks";
 import type { TaskDTO } from "../types/task";
+import { ROUTES } from "../utils/constants";
 
 const columns = [
   { label: "Title", key: "title" },
@@ -70,9 +77,18 @@ const TasksPage: React.FC = () => {
   if (error) return <div>Error loading tasks</div>;
 
   return (
-    <div className="p-6">
-      <div className="mb-4">
-        <strong>Total Tasks:</strong> {totalCount}
+    <div className="px-6 py-2">
+      <div className="mb-4 w-full p-4 bg-gray-50 shadow-sm flex justify-between items-center">
+        <div>
+          <strong>Total Tasks:</strong> {totalCount}
+        </div>
+        <button
+          onClick={() => (window.location.href = ROUTES.ADD_TASK)}
+          className="px-3 py-1 bg-green-400 text-white rounded-md shadow hover:bg-green-500 transition flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>ADD NEW TASK</span>
+        </button>
       </div>
 
       {/* Tasks Table */}
