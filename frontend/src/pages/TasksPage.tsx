@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import { useAllTasks } from "../hooks/useAllTasks";
 import { useDeleteTask } from "../hooks/useDeleteTask";
+import { alertConfirmation } from "../libs/alerts";
 import type { TaskDTO } from "../types/task";
 import { ROUTES } from "../utils/constants";
 
@@ -47,8 +48,15 @@ const TasksPage: React.FC = () => {
   const totalCount = data?.totalElements ?? 0;
   const totalPages = Math.ceil(totalCount / rowsPerPage);
 
-  const handleDelete = (taskId: string) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
+  const handleDelete = async (taskId: string) => {
+    const result = await alertConfirmation(
+      "Delete Task",
+      "Are you sure you want to delete this task?",
+      "Yes, delete it!",
+      "Cancel"
+    );
+
+    if (result.isConfirmed) {
       deleteTask(taskId);
     }
   };

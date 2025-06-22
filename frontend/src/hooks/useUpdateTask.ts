@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { alertError, alertSuccess } from "../libs/alerts";
 import { useApi } from "../libs/useApi";
 import type { TaskDTO } from "../types/task";
 import { TASK_API } from "../utils/apis.constants";
@@ -24,11 +26,13 @@ export const useUpdateTask = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      navigate(ROUTES.TASKS);
+      alertSuccess("Task updated successfully!").then(() => {
+        queryClient.invalidateQueries({ queryKey: ["tasks"] });
+        navigate(ROUTES.TASKS);
+      });
     },
-    onError: (error) => {
-      console.error("Error updating task:", error);
+    onError: (error: AxiosError) => {
+      alertError(error?.response?.data as string);
     },
   });
 };

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useApi } from "../libs/useApi";
 import { TASK_API } from "../utils/apis.constants";
 import { ROUTES } from "../utils/constants";
+import { alertError, alertSuccess } from "../libs/alerts";
+import type { AxiosError } from "axios";
 
 export const useDeleteTask = () => {
   const api = useApi();
@@ -14,11 +16,13 @@ export const useDeleteTask = () => {
       await api.delete(`${TASK_API.DELETE(taskId)}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      navigate(ROUTES.TASKS);
+      alertSuccess("Task deleted successfully!").then(() => {
+        queryClient.invalidateQueries({ queryKey: ["tasks"] });
+        navigate(ROUTES.TASKS);
+      });
     },
-    onError: (error) => {
-      console.error("Error deleting task:", error);
+    onError: (error: AxiosError) => {
+      alertError(error?.response?.data as string);
     },
   });
 };

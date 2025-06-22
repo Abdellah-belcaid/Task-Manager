@@ -4,6 +4,8 @@ import { useApi } from "../libs/useApi";
 import type { TaskDTO } from "../types/task";
 import { TASK_API } from "../utils/apis.constants";
 import { ROUTES } from "../utils/constants";
+import { alertError, alertSuccess } from "../libs/alerts";
+import type { AxiosError } from "axios";
 
 export const useCreateTask = () => {
   const api = useApi();
@@ -16,11 +18,13 @@ export const useCreateTask = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      navigate(ROUTES.TASKS);
+      alertSuccess("Task created successfully!").then(() => {
+        queryClient.invalidateQueries({ queryKey: ["tasks"] });
+        navigate(ROUTES.TASKS);
+      });
     },
-    onError: (error) => {
-      console.error("Error creating task:", error);
+    onError: (error: AxiosError) => {
+      alertError(error?.response?.data as string);
     },
   });
 };
