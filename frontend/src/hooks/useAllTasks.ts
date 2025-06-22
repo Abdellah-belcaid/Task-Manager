@@ -8,6 +8,9 @@ interface TaskQueryParams {
   size?: number;
   sortBy?: string;
   sortDirection?: "asc" | "desc";
+  keyword?: string;
+  status?: string;
+  priority?: string;
 }
 
 interface TaskResponse {
@@ -20,14 +23,34 @@ export const useAllTasks = ({
   size = 5,
   sortBy = "createdAt",
   sortDirection = "asc",
+  keyword = "",
+  status = "",
+  priority = "",
 }: TaskQueryParams) => {
   const api = useApi();
 
   return useQuery<TaskResponse>({
-    queryKey: ["tasks", page, size, sortBy, sortDirection],
+    queryKey: [
+      "tasks",
+      page,
+      size,
+      sortBy,
+      sortDirection,
+      keyword,
+      status,
+      priority,
+    ],
     queryFn: async () => {
       const response = await api.get<TaskResponse>(TASK_API.GET_ALL, {
-        params: { page, size, sortBy, sortDirection },
+        params: {
+          page,
+          size,
+          sortBy,
+          sortDirection,
+          keyword,
+          status,
+          priority,
+        },
       });
       return response.data;
     },
