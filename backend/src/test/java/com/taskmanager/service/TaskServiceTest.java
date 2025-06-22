@@ -3,6 +3,8 @@ package com.taskmanager.service;
 import com.taskmanager.dto.TaskCriteria;
 import com.taskmanager.dto.TaskDTO;
 import com.taskmanager.entity.Task;
+import com.taskmanager.enumration.Priority;
+import com.taskmanager.enumration.Status;
 import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.mapper.TaskMapper;
 import com.taskmanager.repository.TaskRepository;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,7 @@ import static com.taskmanager.util.TaskTestHelper.getOneTaskDto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,6 +56,9 @@ class TaskServiceTest {
                 .size(10)
                 .sortBy("createdAt")
                 .sortDirection("asc")
+                .keyword(null)
+                .status(null)
+                .priority(null)
                 .build();
     }
 
@@ -61,7 +68,7 @@ class TaskServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<Task> taskPage = new PageImpl<>(mockTasks, pageRequest, mockTasks.size());
 
-        when(taskRepository.findAll(pageRequest)).thenReturn(taskPage);
+        when(taskRepository.findAll(any(Specification.class), eq(pageRequest))).thenReturn(taskPage);
 
         Page<TaskDTO> result = taskService.getAllTasks(taskCriteria);
 
@@ -72,6 +79,62 @@ class TaskServiceTest {
         assertThat(result.getContent().getFirst().getCreatedAt()).isEqualTo(mockTasks.getFirst().getCreatedAt());
         assertThat(result.getTotalElements()).isEqualTo(mockTasks.size());
     }
+
+    @Test
+    @DisplayName("Should return filtered TaskDTOs when keyword is provided")
+    void should_returnFilteredTaskDTOs_when_keywordProvided() {
+
+        taskCriteria.setKeyword("Complete math homework");
+        PageRequest pageRequest = PageRequest.of(
+                taskCriteria.getPage() - 1,
+                taskCriteria.getSize(),
+                Sort.by(Sort.Direction.ASC, taskCriteria.getSortBy())
+        );
+
+        List<Task> filtered = mockTasks.stream()
+                .filter(task -> task.getTitle().contains("Complete math homework") || task.getDescription().contains("Complete math homework"))
+                .toList();
+
+        Page<Task> taskPage = new PageImpl<>(filtered, pageRequest, filtered.size());
+
+        when(taskRepository.findAll(any(Specification.class), eq(pageRequest))).thenReturn(taskPage);
+
+
+        Page<TaskDTO> result = taskService.getAllTasks(taskCriteria);
+
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(filtered.size());
+    }
+
+    @Test
+    @DisplayName("Should return filtered TaskDTOs when status and priority are provided")
+    void should_returnFilteredTaskDTOs_when_statusAndPriorityProvided() {
+        taskCriteria.setStatus(Status.TODO);
+        taskCriteria.setPriority(Priority.HIGH);
+
+        PageRequest pageRequest = PageRequest.of(
+                taskCriteria.getPage() - 1,
+                taskCriteria.getSize(),
+                Sort.by(Sort.Direction.ASC, taskCriteria.getSortBy())
+        );
+
+        List<Task> filtered = mockTasks.stream()
+                .filter(task -> task.getStatus() == taskCriteria.getStatus() && task.getPriority() == taskCriteria.getPriority())
+                .toList();
+
+        Page<Task> taskPage = new PageImpl<>(filtered, pageRequest, filtered.size());
+
+        when(taskRepository.findAll(any(Specification.class), eq(pageRequest))).thenReturn(taskPage);
+
+        Page<TaskDTO> result = taskService.getAllTasks(taskCriteria);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(filtered.size());
+        assertThat(result.getContent().getFirst().getStatus()).isEqualTo(taskCriteria.getStatus());
+        assertThat(result.getContent().getFirst().getPriority()).isEqualTo(taskCriteria.getPriority());
+    }
+
 
     @Test
     @DisplayName("Should return TaskDTO when getTaskById is called with a valid ID")

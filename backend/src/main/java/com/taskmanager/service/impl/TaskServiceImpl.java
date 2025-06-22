@@ -2,15 +2,18 @@ package com.taskmanager.service.impl;
 
 import com.taskmanager.dto.TaskCriteria;
 import com.taskmanager.dto.TaskDTO;
+import com.taskmanager.entity.Task;
 import com.taskmanager.exception.TaskNotFoundException;
 import com.taskmanager.mapper.TaskMapper;
 import com.taskmanager.repository.TaskRepository;
+import com.taskmanager.repository.spec.TaskSpecification;
 import com.taskmanager.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -36,7 +39,9 @@ public class TaskServiceImpl implements TaskService {
                 Sort.by(direction, taskCriteria.getSortBy())
         );
 
-        return taskRepository.findAll(pageRequest)
+        Specification<Task> spec = TaskSpecification.withCriteria(taskCriteria);
+
+        return taskRepository.findAll(spec, pageRequest)
                 .map(TaskMapper::toDto);
     }
 

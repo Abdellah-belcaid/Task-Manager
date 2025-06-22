@@ -2,6 +2,8 @@ package com.taskmanager.controller;
 
 import com.taskmanager.dto.TaskCriteria;
 import com.taskmanager.dto.TaskDTO;
+import com.taskmanager.enumration.Priority;
+import com.taskmanager.enumration.Status;
 import com.taskmanager.service.TaskService;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -28,15 +30,22 @@ public class TaskController {
             @RequestParam(defaultValue = "1") @Min(1) Integer page,
             @RequestParam(defaultValue = "10") @Min(1) Integer size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false) Priority priority
     ) {
-        log.info("Get all tasks - Page: {}, Size: {}, Sort By: {}, Sort Direction: {}", page, size, sortBy, sortDirection);
+        log.info("Get all tasks - Page: {}, Size: {}, Sort By: {}, Sort Direction: {}, Keyword: {}, Status: {}, Priority: {}",
+                page, size, sortBy, sortDirection, keyword, status, priority);
 
         TaskCriteria taskCriteria = TaskCriteria.builder()
                 .page(page)
                 .size(size)
                 .sortBy(sortBy)
                 .sortDirection(sortDirection)
+                .keyword(keyword)
+                .status(status)
+                .priority(priority)
                 .build();
 
         Page<TaskDTO> tasks = taskService.getAllTasks(taskCriteria);
@@ -47,6 +56,7 @@ public class TaskController {
         log.info("Fetched {} tasks", tasks.getTotalElements());
         return ResponseEntity.ok(tasks);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskDTO> getTaskById(@PathVariable @NotNull UUID id) {
