@@ -6,3 +6,9 @@ export const TASK_API = {
   UPDATE: (id: string) => `/api/v1/tasks/${id}`,
   DELETE: (id: string) => `/api/v1/tasks/${id}`,
 };
+
+export const USER_API = {
+  BASE_URL: "/api/v1/users",
+  SIGN_UP: "/api/v1/users/sign-up",
+  SIGN_IN: "/api/v1/users/sign-in",
+};
