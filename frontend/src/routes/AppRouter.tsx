@@ -8,6 +8,7 @@ const TasksPage = React.lazy(() => import("../pages/TasksPage"));
 const AddTaskPage = React.lazy(() => import("../pages/AddTaskPage"));
 const EditTaskPage = React.lazy(() => import("../pages/EditTaskPage"));
 const LoginPage = React.lazy(() => import("../pages/LoginPage"));
+const RegisterPage = React.lazy(() => import("../pages/RegisterPage"));
 
 const AppRouter: React.FC = () => {
   const location = useLocation();
@@ -48,6 +49,7 @@ const AppRouter: React.FC = () => {
           }
         />
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
       </Routes>
     </Suspense>
   );

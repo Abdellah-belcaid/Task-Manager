@@ -21,3 +21,17 @@ export const INITIAL_AUTH_VALUES: AuthenticationRequest = {
   username: "",
   password: "",
 };
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+}
+
+export const INITIAL_REGISTER_VALUES: RegisterRequest = {
+  name: "",
+  email: "",
+  username: "",
+  password: "",
+};

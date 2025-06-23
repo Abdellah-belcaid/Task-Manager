@@ -32,10 +32,10 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<UserDTO> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<Void> register(@RequestBody @Valid RegisterRequest request) {
         log.info("Registering new user with username: {}", request.username());
-        UserDTO createdUser = userService.register(request);
+        userService.register(request);
         log.info("User {} registered successfully", request.username());
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
