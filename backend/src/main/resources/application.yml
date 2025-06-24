@@ -29,3 +29,6 @@ app:
     # Internal API key for authentication purposes
   authentication:
     internal-api-key: InternalApiKey1234!
+
+  cors:
+    allowed-origins: http://localhost:5173

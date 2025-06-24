@@ -21,11 +21,11 @@ export const useAuth = () => {
     window.dispatchEvent(new Event("authChange"));
   }, []);
 
-  const getAuthHeader = useCallback(() => {
+  const getAuthToken = useCallback(() => {
     if (user?.token) {
-      return { Authorization: `Bearer ${user.token}` };
+      return user.token;
     }
-    return {};
+    return null;
   }, [user]);
 
   useEffect(() => {
@@ -39,5 +39,5 @@ export const useAuth = () => {
 
   const isAuthenticated = !!user?.token;
 
-  return { user, isAuthenticated, login, logout, getAuthHeader };
+  return { user, isAuthenticated, login, logout, getAuthToken };
 };

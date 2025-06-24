@@ -48,14 +48,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         log.info("Registering new user with email: {}", request.email());
 
         if (userRepository.existsByEmail(request.email())) {
             log.warn("Email already exists: {}", request.email());
             throw new EmailAlreadyExistsException(request.email());
         }
-        
+
         if (userRepository.existsByUsername(request.username())) {
             log.warn("Username already exists: {}", request.username());
             throw new UsernameAlreadyExistsException(request.username());
@@ -68,7 +68,5 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(user);
         log.info("User registered successfully: {}", savedUser.getUsername());
-
-        return UserMapper.toDto(savedUser);
     }
 }
