@@ -3,6 +3,7 @@ package com.taskmanager.service;
 import com.taskmanager.dto.TaskCriteria;
 import com.taskmanager.dto.TaskDTO;
 import com.taskmanager.entity.Task;
+import com.taskmanager.entity.User;
 import com.taskmanager.enumration.Priority;
 import com.taskmanager.enumration.Status;
 import com.taskmanager.exception.TaskNotFoundException;
@@ -40,15 +41,22 @@ class TaskServiceTest {
     @Mock
     private TaskRepository taskRepository;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private TaskServiceImpl taskService;
 
     private List<Task> mockTasks;
     private TaskCriteria taskCriteria;
     private UUID taskId;
+    private UUID userId;
+    private User mockCurrentUser;
 
     @BeforeEach
     void setUp() {
+        userId = UUID.randomUUID();
+        mockCurrentUser = User.builder().id(userId).build();
         mockTasks = TaskTestHelper.getAllTasks();
         taskId = UUID.randomUUID();
         taskCriteria = TaskCriteria.builder()
@@ -141,7 +149,9 @@ class TaskServiceTest {
     void should_returnTaskDTO_when_getTaskById_withValidId() {
         Task mockTask = mockTasks.getFirst();
         mockTask.setId(taskId);
+        mockTask.setUser(mockCurrentUser);
 
+        when(userService.getCurrentUser()).thenReturn(mockCurrentUser);
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(mockTask));
 
         TaskDTO result = taskService.getTaskById(taskId);
@@ -189,12 +199,14 @@ class TaskServiceTest {
     void should_deleteTask_when_deleteTask_withValidId() {
         Task mockTask = mockTasks.getFirst();
         mockTask.setId(taskId);
+        mockTask.setUser(mockCurrentUser);
 
-        when(taskRepository.existsById(taskId)).thenReturn(true);
+        when(userService.getCurrentUser()).thenReturn(mockCurrentUser);
+        when(taskRepository.existsByTaskIdAndUserId(taskId, userId)).thenReturn(true);
 
         taskService.deleteTask(taskId);
 
-        assertThat(taskRepository.existsById(taskId)).isTrue();
+        assertThat(taskRepository.existsByTaskIdAndUserId(taskId, userId)).isTrue();
     }
 
     @Test
@@ -202,7 +214,8 @@ class TaskServiceTest {
     void should_throwTaskNotFoundException_when_deleteTask_withInvalidId() {
         UUID invalidTaskId = UUID.randomUUID();
 
-        when(taskRepository.existsById(invalidTaskId)).thenReturn(false);
+        when(userService.getCurrentUser()).thenReturn(mockCurrentUser);
+        when(taskRepository.existsByTaskIdAndUserId(invalidTaskId, userId)).thenReturn(false);
 
         assertThatThrownBy(() -> taskService.deleteTask(invalidTaskId))
                 .isInstanceOf(TaskNotFoundException.class)
@@ -217,7 +230,8 @@ class TaskServiceTest {
         Task taskEntity = TaskMapper.toEntity(taskDTO);
         taskEntity.setId(taskId);
 
-        when(taskRepository.existsById(taskId)).thenReturn(true);
+        when(userService.getCurrentUser()).thenReturn(User.builder().id(userId).build());
+        when(taskRepository.existsByTaskIdAndUserId(taskId, userId)).thenReturn(true);
         when(taskRepository.save(any(Task.class))).thenReturn(taskEntity);
 
         TaskDTO result = taskService.updateTask(taskId, taskDTO);
@@ -235,7 +249,8 @@ class TaskServiceTest {
         UUID invalidTaskId = UUID.randomUUID();
         TaskDTO taskDTO = getOneTaskDto(0);
 
-        when(taskRepository.existsById(invalidTaskId)).thenReturn(false);
+        when(userService.getCurrentUser()).thenReturn(mockCurrentUser);
+        when(taskRepository.existsByTaskIdAndUserId(invalidTaskId, userId)).thenReturn(false);
 
         assertThatThrownBy(() -> taskService.updateTask(invalidTaskId, taskDTO))
                 .isInstanceOf(TaskNotFoundException.class)
