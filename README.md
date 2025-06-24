@@ -168,3 +168,26 @@ Database schema is versioned and managed with Flyway. Migrations run automatical
 - Nginx routing fallback for SPA support
 
 ---
+
+## 🛠️ GitHub Actions CI Pipeline
+
+The project includes a GitHub Actions CI pipeline to automate testing and building for both the backend and frontend. Below are the defined stages:
+
+#### Backend - Tests
+
+- Runs on `ubuntu-latest`.
+- Sets up PostgreSQL as a service.
+- Installs dependencies and runs backend tests using Maven.
+
+#### Backend - Build
+
+- Runs on `ubuntu-latest`.
+- Depends on the successful completion of the backend tests.
+- Builds the backend using Maven.
+
+#### Frontend - Build
+
+- Runs on `ubuntu-latest`.
+- Installs dependencies and builds the frontend using Node.js.
+
+This pipeline ensures code quality and seamless integration for both backend and frontend components.
