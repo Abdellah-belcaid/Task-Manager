@@ -1,12 +1,17 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Lock, Mail, User } from "lucide-react";
 import React from "react";
+import { Link } from "react-router-dom";
 import { useRegister } from "../hooks/useRegister";
 import { RegisterValidationSchema } from "../libs/validation/user.validation.shemas";
-import { INITIAL_REGISTER_VALUES } from "../types/user";
+import { INITIAL_REGISTER_VALUES, type RegisterRequest } from "../types/user";
+import { ROUTES } from "../utils/constants";
 
 const RegisterPage: React.FC = () => {
-  const { mutate, isPending } = useRegister();
+  const { mutate: register, isPending } = useRegister();
+  const handleRegister = (values: RegisterRequest) => {
+    register(values);
+  };
 
   return (
     <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-green-500 to-blue-600">
@@ -14,12 +19,10 @@ const RegisterPage: React.FC = () => {
         <Formik
           initialValues={INITIAL_REGISTER_VALUES}
           validationSchema={RegisterValidationSchema}
-          onSubmit={(values) => {
-            mutate(values);
-          }}
+          onSubmit={handleRegister}
         >
-          {({ isSubmitting }) => (
-            <Form className="space-y-6">
+          {() => (
+            <Form className="space-y-4">
               <h2 className="text-3xl font-extrabold text-center text-gray-800">
                 Create Account
               </h2>
@@ -102,13 +105,23 @@ const RegisterPage: React.FC = () => {
               <button
                 type="submit"
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50"
-                disabled={isSubmitting || isPending}
+                disabled={isPending}
               >
                 {isPending ? "Registering..." : "Register"}
               </button>
             </Form>
           )}
         </Formik>
+
+        <p className="text-center text-gray-500 mt-4">
+          Already have an account?{" "}
+          <Link
+            to={ROUTES.LOGIN}
+            className="text-green-600 hover:text-green-700 hover:underline font-semibold"
+          >
+            Log in
+          </Link>
+        </p>
       </div>
     </div>
   );

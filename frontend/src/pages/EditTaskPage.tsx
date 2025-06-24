@@ -35,7 +35,9 @@ const EditTaskPage: React.FC = () => {
 
   return (
     <div className="px-6 py-2">
-      <h1 className="text-xl font-bold mb-2">Edit Task</h1>
+      <div className="flex justify-center items-center mb-4">
+        <h1 className="text-2xl font-bold text-gray-800">Edit Task</h1>
+      </div>
       {initialValues && (
         <TaskForm initialValues={initialValues} onSubmit={handleSubmit} />
       )}

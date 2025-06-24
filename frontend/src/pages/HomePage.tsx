@@ -1,4 +1,5 @@
 import React from "react";
+import { ROUTES } from "../utils/constants";
 
 const HomePage: React.FC = () => {
   return (
@@ -12,7 +13,10 @@ const HomePage: React.FC = () => {
         </p>
       </header>
       <main className="mt-12">
-        <button className="px-8 py-4 bg-blue-600 text-white text-lg font-medium rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
+        <button
+          onClick={() => (window.location.href = ROUTES.TASKS)}
+          className="px-8 py-4 bg-blue-600 text-white text-lg font-medium rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+        >
           Get Started
         </button>
       </main>

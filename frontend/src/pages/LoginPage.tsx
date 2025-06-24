@@ -1,12 +1,18 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Lock, User } from "lucide-react";
 import React from "react";
+import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
 import { LoginValidationSchema } from "../libs/validation/user.validation.shemas";
-import { INITIAL_AUTH_VALUES } from "../types/user";
+import { INITIAL_AUTH_VALUES, type AuthenticationRequest } from "../types/user";
+import { ROUTES } from "../utils/constants";
 
 const LoginPage: React.FC = () => {
-  const { mutate, isPending } = useLogin();
+  const { mutate: login, isPending } = useLogin();
+
+  const handlLogin = (values: AuthenticationRequest) => {
+    login(values);
+  };
 
   return (
     <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
@@ -14,11 +20,9 @@ const LoginPage: React.FC = () => {
         <Formik
           initialValues={INITIAL_AUTH_VALUES}
           validationSchema={LoginValidationSchema}
-          onSubmit={(values) => {
-            mutate(values);
-          }}
+          onSubmit={handlLogin}
         >
-          {({ isSubmitting }) => (
+          {() => (
             <Form className="space-y-6">
               <h2 className="text-3xl font-extrabold text-center text-gray-800">
                 Welcome Back
@@ -64,10 +68,20 @@ const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50"
-                disabled={isSubmitting || isPending}
+                disabled={isPending}
               >
                 {isPending ? "Logging in..." : "Log In"}
               </button>
+
+              <p className="text-center text-gray-500 mt-4">
+                Don't have an account?{" "}
+                <Link
+                  to={ROUTES.REGISTER}
+                  className="text-blue-600 hover:underline"
+                >
+                  Register here
+                </Link>
+              </p>
             </Form>
           )}
         </Formik>
