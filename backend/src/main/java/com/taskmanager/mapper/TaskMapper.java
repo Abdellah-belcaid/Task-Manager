@@ -3,6 +3,8 @@ package com.taskmanager.mapper;
 import com.taskmanager.dto.TaskDTO;
 import com.taskmanager.entity.Task;
 
+import java.util.Optional;
+
 public class TaskMapper {
 
     private TaskMapper() {
@@ -22,6 +24,7 @@ public class TaskMapper {
                 .completed(task.isCompleted())
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
+                .user(UserMapper.toDto(task.getUser()))
                 .build();
     }
 
@@ -36,6 +39,7 @@ public class TaskMapper {
                 .priority(dto.getPriority())
                 .dueDate(dto.getDueDate())
                 .completed(dto.isCompleted())
+                .user(UserMapper.toEntity(dto.getUser()))
                 .build();
     }
 }

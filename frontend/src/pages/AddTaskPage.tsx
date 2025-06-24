@@ -12,7 +12,9 @@ const AddTaskPage: React.FC = () => {
 
   return (
     <div className="px-6 py-2">
-      <h1 className="text-xl font-bold mb-2">Add New Task</h1>
+      <h1 className="text-xl font-bold mb-4 text-center text-gray-800">
+        Add New Task
+      </h1>
       <TaskForm initialValues={INIT_TASK_VALUES} onSubmit={handleSubmit} />
       {error && (
         <div className="bg-red-100 text-red-700 p-3 rounded mt-2">
