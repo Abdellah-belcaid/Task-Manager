@@ -149,15 +149,6 @@ Database schema is versioned and managed with Flyway. Migrations run automatical
 
 ---
 
-## 📁 Sample Users (for Testing)
-
-| Username | Password | Role  |
-| -------- | -------- | ----- |
-| admin    | admin123 | ADMIN |
-| user     | user1234 | USER  |
-
----
-
 ## 🧠 Architecture Highlights
 
 - Clean code with service/repository/controller layers
